@@ -1,0 +1,51 @@
+
+.hero-section {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+.hero-video-bg {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+  z-index: -2;
+  filter: brightness(0.6) saturate(1.2) blur(3px);
+}
+.particles-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+.hero-carousel {
+  position: relative;
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem 0 3rem;
+  z-index: 100;
+}
+.poster-container {
+  cursor: pointer;
+  position: relative;
+  outline: none;
+}
+.poster-img {
+  border-radius: 14px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(255, 138, 0, 0.8);
+  transition: box-shadow 0.3s;
+}
+.poster-img:hover {
+  box-shadow: 0 15px 40px rgba(255, 220, 0, 1);
+}
+.poster-title {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+  text-shadow: 0 0 8px #fb8c00;
+}
