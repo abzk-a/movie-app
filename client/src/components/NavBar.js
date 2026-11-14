@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Toolbar, Typography, InputBase, Avatar, Box, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Typography, Avatar, Box, IconButton, Autocomplete, TextField } from "@mui/material";
 import { Search as SearchIcon, ArrowDropDown } from "@mui/icons-material";
 import { alpha, styled } from "@mui/material/styles";
 
@@ -9,32 +9,11 @@ const Search = styled("div")(({ theme }) => ({
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   "&:hover": { backgroundColor: alpha(theme.palette.common.white, 0.25) },
   marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: { marginLeft: theme.spacing(1), width: "auto" },
+  flexShrink: 0,
+  [theme.breakpoints.up("sm")]: { marginLeft: theme.spacing(1) },
 }));
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("sm")]: { width: "20ch", "&:focus": { width: "30ch" } },
-  },
-}));
-
-const NavBar = ({ onSearch }) => {
+const NavBar = ({ onSearch, movies }) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -73,13 +52,59 @@ const NavBar = ({ onSearch }) => {
           </Typography>
 
           <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-              onChange={(e) => onSearch(e.target.value)}
+            <Autocomplete
+              freeSolo
+              options={movies}
+              getOptionLabel={(movie) => typeof movie === "string" ? movie : movie.title}
+              filterOptions={(options, { inputValue }) => {
+                const query = inputValue.trim().toLowerCase();
+                if (!query) return [];
+
+                return options
+                  .filter((movie) =>
+                    [movie.title, movie.category, ...movie.genres]
+                      .some((value) => value.toLowerCase().includes(query))
+                  )
+                  .slice(0, 6);
+              }}
+              noOptionsText="No matching movies"
+              onInputChange={(_event, value) => onSearch(value)}
+              onChange={(_event, movie) => {
+                if (movie && typeof movie !== "string") onSearch(movie.title);
+              }}
+              renderOption={(props, movie) => (
+                <Box component="li" {...props} key={movie.title} sx={{ display: "block" }}>
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    {movie.title}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {[movie.category, ...movie.genres].join(" · ")}
+                  </Typography>
+                </Box>
+              )}
+              sx={{
+                width: { xs: "min(46vw, 220px)", sm: 250 },
+                "& .MuiInputBase-root": { color: "inherit", pr: "8px !important" },
+                "& .MuiInputBase-input": { padding: "8px 8px 8px 4px !important" },
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Search movies..."
+                  variant="standard"
+                  inputProps={{ ...params.inputProps, "aria-label": "Search movies" }}
+                  InputProps={{
+                    ...params.InputProps,
+                    disableUnderline: true,
+                    startAdornment: (
+                      <>
+                        <SearchIcon sx={{ mx: 1, color: "inherit", opacity: 0.7 }} />
+                        {params.InputProps.startAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
             />
           </Search>
 
